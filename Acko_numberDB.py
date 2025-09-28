@@ -81,7 +81,7 @@ class InsuranceSupport():
 
         print(response.status_code)
         if response.status_code == 200:
-            print(response.json())  # If the response is in JSON format
+            print(response.text)  # If the response is in JSON format
 
         return True
     # --------------------------
