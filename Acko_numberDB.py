@@ -1,4 +1,4 @@
-from typing import Dict, TypedDict, Optional
+from typing import Dict, TypedDict, Optional, List
 from langgraph.graph import StateGraph, END
 
 # poc_inlo_app.py
@@ -8,6 +8,7 @@ import io
 from PIL import Image
 import json
 import openai
+import requests
 
 # -------------------------------
 # Page Setup
@@ -28,6 +29,15 @@ class GraphState(TypedDict):
     vehicle_owner: Optional[str]
     insurance_number: Optional[str]
     response: Optional[str]
+
+# --------------------------
+# Step 1: Email Data
+# --------------------------
+class EmailData(TypedDict):
+    to: List[str]
+    cc: List[str]
+    subject: str
+    body: str
 
 class InsuranceSupport():
     def __init__(self, api_key: str, image: any, base_url: str = "https://openrouter.ai/api/v1"):
@@ -50,8 +60,23 @@ class InsuranceSupport():
         "KA02CD5678": {"owner": "Anand", "insurance": "INS987654"},
     }
 
+    def _send_mail(self, mail: EmailData) -> bool:
+        # Mock email sending function
+        to = mail.get("to", [])
+        cc = mail.get("cc", [])
+        subject = mail.get("subject", "")
+        body = mail.get("body", "")
 
+        print(f"Sending email to: {to}, cc: {cc}, subject: {subject}, body: {body}")
+        # Simulate sending email via n8n webhook
+        url = "https://anand-outskill.app.n8n.cloud/webhook/a7c289d5-5b98-4105-b456-8e69fdaa1ea5"
+        response = requests.post(url, json=mail)
 
+        print(response.status_code)
+        if response.status_code == 200:
+            print(response.json())  # If the response is in JSON format
+
+        return True
     # --------------------------
     # Node 1: Vehicle Verification
     # --------------------------
@@ -83,7 +108,20 @@ class InsuranceSupport():
     # --------------------------
     def _handle_police_ambulance_service_agent_node(self, state):
         loc = state.get("location", "Unknown")
-        return {"response": f"Fatal & serious condition at {loc}. Arrange call to police, ambulance & service agent."}
+        owner = state.get("vehicle_owner", "Unknown")
+        mail_dict = {
+            "to": [
+                "grader_vaguely921@simplelogin.com"
+            ],
+            "cc": [
+                "ccperson1@example.com",
+                "ccperson2@example.com"
+            ],
+            "subject": "reg: Your car is ready for pick up",
+            "body": f"Hello {owner},\n\nAn ambulance has been dispatched to your location at {loc}. Additionally, your car will be picked up for towing in 15 minutes and will arrive at the service centre within 45 minutes.\n\nStay safe,\nSupport Team"
+        }
+        self._send_mail(mail_dict)
+        return {"response": f"Fatal & serious condition at {loc}. Arrange call to police, ambulance & service agent. Email sent to owner."}
 
     # --------------------------
     # Node 4: Inoperative = No
