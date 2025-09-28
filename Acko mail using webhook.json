@@ -1,0 +1,155 @@
+{
+  "name": "Acko mail using webhook",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "a7c289d5-5b98-4105-b456-8e69fdaa1ea5",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "5a0e5697-dfd3-4ef2-bef0-979cffd242dc",
+      "name": "Webhook",
+      "webhookId": "a7c289d5-5b98-4105-b456-8e69fdaa1ea5"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Send an email using the contents from the JSON body, figuring out to, cc, subject, and body from the JSON body. Take to id from {{ $json.body.to }}\ntake CC from {{ $json.body.cc }}. Note CC can be empty\nTake subject from {{ $json.body.subject }}\n\nTake email body content from {{ $json.body.body }}\nUse tool calling, use the Gmail tool. \n\nFormat the email body such that the salutation signature are in seperat line, use html formating\n",
+        "options": {
+          "systemMessage": "You are an expert in sending emails."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "c729e171-e6ec-4660-bb31-0b140e1715c7",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "={{ $json.output }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        560,
+        0
+      ],
+      "id": "ec441bb9-aed7-4cbc-9e92-9b0d100d4bfd",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        112,
+        176
+      ],
+      "id": "8f31aa46-5563-49f2-9b2d-eed66872890a",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "bkpRgh6pLnEO5IF0",
+          "name": "OpenRouter account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('To', ``, 'string') }}",
+        "subject": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Subject', ``, 'string') }}",
+        "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', ``, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        352,
+        208
+      ],
+      "id": "886cf891-2f16-48bf-bd1e-6b45294c8142",
+      "name": "Send a message in Gmail",
+      "webhookId": "dc7b900a-fdf5-4469-aa82-5eed32175778",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "atoNpMvQN2I3H2bs",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message in Gmail": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "7cb63723-2139-4709-9d01-224d10ecc39a",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "f1a50c7eaff4160d086ff3a83345113c5df042d97dbe7316022b2c56fe7bcf1f"
+  },
+  "id": "mbTf15Cc7EZW43gE",
+  "tags": []
+}
