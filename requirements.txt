@@ -1,4 +1,8 @@
 streamlit
 langgraph
 openai
+torch
+transformers
+Pillow
+torchvision
 

@@ -10,6 +10,8 @@ import json
 import openai
 import requests
 
+import localcompare_number
+
 # -------------------------------
 # Page Setup
 # -------------------------------
@@ -46,19 +48,32 @@ class InsuranceSupport():
             print("Image received for analysis.")
             print(f"Image format: {image.format}, size: {image.size}, mode: {image.mode}")
 
-        self.client = openai.OpenAI(
-            api_key=api_key,
-            base_url=base_url
-        )
-        self.model = "openai/gpt-4o"
+            result = localcompare_number.compare_vehicle(image)
+
+            print(" vehicle number ", result.get("vehicle_number"))
+            print(" is operative ", result.get("operative"))
+
+            self._vehicle_info.vehicle_number = result.get("vehicle_number", "Unknown")
+            self._vehicle_info.inoperative = result.get("operative", "unknown")
+
+
+        # self.client = openai.OpenAI(
+        #     api_key=api_key,
+        #     base_url=base_url
+        # )
+        # self.model = "openai/gpt-4o"
         self.app = self._build_graph()
     # --------------------------
     # Dummy Vehicle DB
     # --------------------------
     _vehicle_db = {
-        "KA01AB1234": {"owner": "Shajee", "insurance": "INS123456"},
-        "KA02CD5678": {"owner": "Anand", "insurance": "INS987654"},
+        "GJ01 JY0887": {"owner": "Shajee", "insurance": "INS123456"},
+        "GJ01 JY0888": {"owner": "Anand", "insurance": "INS987655"},
     }
+
+    _vehicle_info = {}
+    # ---------------- CONFIGURE PATHS ----------------
+    _reference_image = "Good4.jpg"   # <-- reference image path
 
     def _send_mail(self, mail: EmailData) -> bool:
         # Mock email sending function
@@ -109,19 +124,15 @@ class InsuranceSupport():
     def _handle_police_ambulance_service_agent_node(self, state):
         loc = state.get("location", "Unknown")
         owner = state.get("vehicle_owner", "Unknown")
-        mail_dict = {
+        mail_dict: EmailData = {
             "to": [
                 "grader_vaguely921@simplelogin.com"
             ],
-            "cc": [
-                "ccperson1@example.com",
-                "ccperson2@example.com"
-            ],
-            "subject": "reg: Your car is ready for pick up",
-            "body": f"Hello {owner},\n\nAn ambulance has been dispatched to your location at {loc}. Additionally, your car will be picked up for towing in 15 minutes and will arrive at the service centre within 45 minutes.\n\nStay safe,\nSupport Team"
+            "subject": "reg: Accident Assistance Required",
+            "body": f"{owner} met with Fatal & serious accident at {loc}. Arrange call to police, ambulance & service agent. "
         }
         self._send_mail(mail_dict)
-        return {"response": f"Fatal & serious condition at {loc}. Arrange call to police, ambulance & service agent. Email sent to owner."}
+        return {"response": f"Fatal & serious condition at {loc}. Arrange call to police, ambulance & service agent."}
 
     # --------------------------
     # Node 4: Inoperative = No
@@ -215,24 +226,24 @@ class InsuranceSupport():
         # --------------------------
         # Vehicle exists, inoperative = Yes
         print(self.app.invoke({
-            "vehicle_number": "KA01AB1234",
-            "inoperative": "Yes",
+            "vehicle_number": self._vehicle_info.get("vehicle_number", "GJ01 JY0887"),
+            "inoperative": self._vehicle_info.get("inoperative", "yes"),
             "location": "Koramangala"
         }))
 
-        # # Vehicle exists, inoperative = No
-        print(self.app.invoke({
-            "vehicle_number": "KA02CD5678",
-            "inoperative": "No",
-            "location": "Whitefield"
-        }))
+        # # # Vehicle exists, inoperative = No
+        # print(self.app.invoke({
+        #     "vehicle_number": "KA02CD5678",
+        #     "inoperative": "No",
+        #     "location": "Whitefield"
+        # }))
 
-        # # Vehicle does not exist, inoperative = Maybe
-        print(self.app.invoke({
-            "vehicle_number": "KA03EF9999",
-            "inoperative": "Maybe",
-            "location": "Indiranagar"
-        }))
+        # # # Vehicle does not exist, inoperative = Maybe
+        # print(self.app.invoke({
+        #     "vehicle_number": "KA03EF9999",
+        #     "inoperative": "Maybe",
+        #     "location": "Indiranagar"
+        # }))
 
 
 
@@ -291,16 +302,22 @@ if uploaded:
     st.image(image, caption="Uploaded Image", use_container_width=True)
 
     # (Optional) send to backend
-    if st.button("Analyze Damage"):
+    if st.button("Load Image"):
         try:
             # Mock: pretend backend call
             # Replace with: requests.post("http://backend/analyze", files={"file": uploaded})
             support = InsuranceSupport(api_key=api_key, image=image) # commonet below line and uncomment this to use langgraph
-            support.test_api()
-            resp = {"status":"ok","damage_level":"High","recommendation":"Tow required"}
-            st.session_state["last_response"] = resp
-            st.success("Image analyzed successfully")
-            st.json(resp)
+            # resp = {"status":"ok","damage_level":"High","recommendation":"Tow required"}
+            # st.session_state["last_response"] = resp
+            st.success("Load Image successfull")
+            st.sesssion_state["support"] = support
+            # st.json(resp)
+        except Exception as e:
+            st.error(f"Backend error: {e}")
+
+    if st.button("Analyze Damage"):
+        try:
+            st.session_state["support"].test_api()
         except Exception as e:
             st.error(f"Backend error: {e}")
 
