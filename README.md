@@ -1,6 +1,8 @@
+#AccidentAssist :This project is an AI-driven workflow and data processing system 🤖 that automates tasks, enables real-time decision-making ⏱️, and provides interactive visualizations 📊. It integrates n8n ⚙️ for workflow automation, Streamlit 🌐 for dashboards, LangGraph 🔗 for state management, HuggingFace 🧠 for NLP, and PyTorch 🔥 for deep learning. The modular architecture ensures seamless data flow ➡️, real-time AI inference ⚡, and scalable design 📈. Key outcomes include improved workflow efficiency ✅, AI-powered insights 💡, and a foundation for future enhancements 🚀.
 # AccidentAssist — Intelligent Accident Response
 
 When an accident happens, most customers panic and don’t know the next step: call police, ambulance, fire, insurer, or a relative? **AccidentAssist** solves this confusion with an **agentic multi-agent system** that automates triage, dispatch, and communication.
+
 
 ---
 
