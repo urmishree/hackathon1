@@ -38,6 +38,7 @@ def image_similarity(img1, img2):
 
 # ---------------- Main Comparison ----------------
 def compare_vehicle(target_img, reference_img=reference_image):
+    print("Comparing target image:", target_img, "with reference image:", reference_img)
     try:
         ref_caption = caption_image(reference_img)
         tgt_caption = caption_image(target_img)

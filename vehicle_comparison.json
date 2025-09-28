@@ -1,0 +1,8 @@
+{
+    "vehicle_number": "GJ01 JY0887",
+    "condition": "good",
+    "operative": "yes",
+    "same-vehicle": true,
+    "overall_similarity": 0.69,
+    "explanation": "Reference: a red car parked in a parking lot | Target: a red car that is parked in a parking lot"
+}

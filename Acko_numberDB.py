@@ -42,20 +42,12 @@ class EmailData(TypedDict):
     body: str
 
 class InsuranceSupport():
-    def __init__(self, api_key: str, image: any, base_url: str = "https://openrouter.ai/api/v1"):
+    def __init__(self, api_key: str, base_url: str = "https://openrouter.ai/api/v1"):
         # Initialize with OpenRouter API credentials
-        if image:
-            print("Image received for analysis.")
-            print(f"Image format: {image.format}, size: {image.size}, mode: {image.mode}")
-
-            result = localcompare_number.compare_vehicle(image)
-
-            print(" vehicle number ", result.get("vehicle_number"))
-            print(" is operative ", result.get("operative"))
-
-            self._vehicle_info.vehicle_number = result.get("vehicle_number", "Unknown")
-            self._vehicle_info.inoperative = result.get("operative", "unknown")
-
+        if not api_key:
+            raise ValueError("API key is required")
+        else:   
+            print("API key provided")
 
         # self.client = openai.OpenAI(
         #     api_key=api_key,
@@ -220,15 +212,42 @@ class InsuranceSupport():
         return app
 
 
-    def test_api(self):
-        # --------------------------
-        # Step 7: Test Inputs
-        # --------------------------
-        # Vehicle exists, inoperative = Yes
+    def _start_intialize_state(self):
+
+        state = GraphState(
+            vehicle_number="",
+            inoperative="",
+            location="Koramangala"
+        )
+        return state
+
+    def start_vehicle_analysis(self, image):
+        print("Starting vehicle analysis...")
+        result = localcompare_number.compare_vehicle("broken4.jpg")
+
+        state  = self._start_intialize_state()
+
+        if image:
+            print("Image received for analysis.")
+            print(f"Image format: {image.format}, size: {image.size}, mode: {image.mode}")
+
+        print(" vehicle number ", result.get("vehicle_number"))
+        print(" is operative ", result.get("operative"))
+
+        state["vehicle_number"] = result.get("vehicle_number", "Unknown")
+        state["inoperative"] = result.get("operative", "unknown")
+
+        return state
+
+    def test_api(self, state):
+        # --------------------------  
+        # Step 7: Test Inputs  
+        # --------------------------  
+        # Vehicle exists, inoperative = Yes  
         print(self.app.invoke({
-            "vehicle_number": self._vehicle_info.get("vehicle_number", "GJ01 JY0887"),
-            "inoperative": self._vehicle_info.get("inoperative", "yes"),
-            "location": "Koramangala"
+            "vehicle_number": state["vehicle_number"],
+            "inoperative": state["inoperative"],
+            "location": state["location"]
         }))
 
         # # # Vehicle exists, inoperative = No
@@ -291,33 +310,36 @@ with st.sidebar:
 
 
 
+if 'support' not in st.session_state:
+    st.session_state["support"] = InsuranceSupport(api_key=api_key)
+# if "isInitialized" not in st.session_state:
+#     st.session_state["isInitialized"] = False
 
 # -------------------------------
 # Upload crashed car image
 # -------------------------------
+
 uploaded = st.file_uploader("Upload a crashed car image", type=["jpg","jpeg","png"])
 
 if uploaded:
-    image = Image.open(uploaded).convert("RGB")
-    st.image(image, caption="Uploaded Image", use_container_width=True)
+    st.session_state["image"] = Image.open(uploaded).convert("RGB")
+    st.image(st.session_state["image"], caption="Uploaded Image", width='stretch')
+    # st.session_state["isInitialized"] = False
 
-    # (Optional) send to backend
     if st.button("Load Image"):
         try:
-            # Mock: pretend backend call
-            # Replace with: requests.post("http://backend/analyze", files={"file": uploaded})
-            support = InsuranceSupport(api_key=api_key, image=image) # commonet below line and uncomment this to use langgraph
-            # resp = {"status":"ok","damage_level":"High","recommendation":"Tow required"}
-            # st.session_state["last_response"] = resp
             st.success("Load Image successfull")
-            st.sesssion_state["support"] = support
+            st.session_state["support_state"] =  st.session_state["support"].start_vehicle_analysis(st.session_state["image"])
+            print("Support state:", st.session_state["support_state"])
+            # st.session_state["isInitialized"] = True
             # st.json(resp)
         except Exception as e:
             st.error(f"Backend error: {e}")
 
     if st.button("Analyze Damage"):
         try:
-            st.session_state["support"].test_api()
+            st.session_state["support"].test_api(st.session_state["support_state"])
+            st.success("Damage analysis started.")
         except Exception as e:
             st.error(f"Backend error: {e}")
 
