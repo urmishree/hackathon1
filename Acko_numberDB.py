@@ -59,8 +59,8 @@ class InsuranceSupport():
     # Dummy Vehicle DB
     # --------------------------
     _vehicle_db = {
-        "GJ01 JY0887": {"owner": "Shajee", "insurance": "INS123456"},
-        "GJ01 JY0888": {"owner": "Anand", "insurance": "INS987655"},
+        "GJ01 JY0887": {"owner": "Kumar", "insurance": "INS123456"},
+        "GJ01 JY0888": {"owner": "Sonia", "insurance": "INS987655"},
     }
 
     _vehicle_info = {}
