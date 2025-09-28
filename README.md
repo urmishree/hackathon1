@@ -1,3 +1,5 @@
+[![AccidentAssist Demo](https://img.loom.com/v1/thumbnails/d981e74b860c4f1f95abf79abfbc2000?sid=d5e325f1-4ed6-4c35-8730-dc0249d23026)](https://www.loom.com/share/d981e74b860c4f1f95abf79abfbc2000?sid=d5e325f1-4ed6-4c35-8730-dc0249d23026)
+
 #AccidentAssist :This project is an AI-driven workflow and data processing system 🤖 that automates tasks, enables real-time decision-making ⏱️, and provides interactive visualizations 📊. It integrates n8n ⚙️ for workflow automation, Streamlit 🌐 for dashboards, LangGraph 🔗 for state management, HuggingFace 🧠 for NLP, and PyTorch 🔥 for deep learning. The modular architecture ensures seamless data flow ➡️, real-time AI inference ⚡, and scalable design 📈. Key outcomes include improved workflow efficiency ✅, AI-powered insights 💡, and a foundation for future enhancements 🚀.
 # AccidentAssist — Intelligent Accident Response
 
