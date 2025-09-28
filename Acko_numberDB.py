@@ -118,7 +118,9 @@ class InsuranceSupport():
         owner = state.get("vehicle_owner", "Unknown")
         mail_dict: EmailData = {
             "to": [
-                "grader_vaguely921@simplelogin.com"
+                "grader_vaguely921@simplelogin.com",
+                "Shajee.cloud@gmail.com",
+                "m.urmishree@gmail.com"
             ],
             "subject": "reg: Accident Assistance Required",
             "body": f"{owner} met with Fatal & serious accident at {loc}. Arrange call to police, ambulance & service agent. "
