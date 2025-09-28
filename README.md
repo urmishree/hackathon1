@@ -61,5 +61,6 @@ If injuries or fire occur, **call 112 (India)** or the relevant local emergency 
 
 **AccidentAssist** = the right help, at the right time, with real-time transparency.
 This is how user get notified:
-![notification](https://github.com/user-attachments/assets/aa93e9ff-1fba-4c35-9e40-45cfd71f2b51)
+
+![notification](./mail.jpg)
 
